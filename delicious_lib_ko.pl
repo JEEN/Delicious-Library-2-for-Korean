@@ -5,7 +5,7 @@ use AnyEvent;
 use AnyEvent::Handle;
 use WebService::Aladdin;
 use Mac::AppleScript qw(RunAppleScript);
-use Encode qw/encode/;
+use Encode qw/decode/;
 
 $| = 1;
 
@@ -41,7 +41,6 @@ sub create_handle {
 					my $aladdin = WebService::Aladdin->new;
 					my $res = $aladdin->search($code);
 					my $result = $res->{items}->[0];
-					warn $code;
 					return undef unless $result;
 					my $param = {
 						book_name => $result->{title},
@@ -53,6 +52,7 @@ sub create_handle {
 						features  => $result->{description},
 						notes     => $result->{content},
 					};
+					$param->{$_} = decode('utf8', $param->{$_}) for keys %{ $param };
 					__run_apple_script($param);
 					$cache->{$code} = 1;
             	}
