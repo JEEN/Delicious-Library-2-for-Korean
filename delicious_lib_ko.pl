@@ -81,7 +81,7 @@ sub __run_apple_script {
 
 	my $script = <<SCRIPT;
 tell first document of application "Delicious Library 2"
-set selected media to make new book with properties {name:"$param->{book_name}", creators:"$param->{authors}", publisher:"$param->{publisher}", genres:"$param->{genres}", cover URL:"$param->{image}", isbn:"$param->{isbn}", price:"$param->{price}", features:"$param->{features}", notes:"$param->{notes}"}
+set selected media to make new book with properties {name:"$param->{book_name}", creators:"$param->{authors}", publisher:"$param->{publisher}", genres:"$param->{genres}", cover URL:"$param->{image}", isbn:"$param->{isbn}", price:"$param->{price}", associated URL:"$param->{url}", features:"$param->{features}", notes:"$param->{notes}"}
 end tell
 SCRIPT
 
