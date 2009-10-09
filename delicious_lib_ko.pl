@@ -6,7 +6,6 @@ use AnyEvent::Handle;
 use WebService::Aladdin;
 use Mac::AppleScript qw(RunAppleScript);
 use Encode qw/decode/;
-use Data::Dumper;
 
 $| = 1;
 
@@ -86,7 +85,5 @@ set selected media to make new book with properties {name:"$param->{book_name}",
 end tell
 SCRIPT
 
-    warn Dumper $param;
 	RunAppleScript($script);
-    warn $@ if $@;
 }
