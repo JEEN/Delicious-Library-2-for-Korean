@@ -6,6 +6,7 @@ use AnyEvent::Handle;
 use WebService::Aladdin;
 use Mac::AppleScript qw(RunAppleScript);
 use Encode qw/decode/;
+use Data::Dumper;
 
 $| = 1;
 
@@ -51,8 +52,11 @@ sub create_handle {
 						isbn      => $result->{isbn},
 						features  => $result->{description},
 						notes     => $result->{content},
+						url       => $result->{link},
+						pages     => $result->{itemPage},
+						price     => $result->{priceStandard},
 					};
-					$param->{$_} = decode('utf8', $param->{$_}) for keys %{ $param };  # WebService::Aladdin::Item is fucked
+					$param = _filter($param);
 					__run_apple_script($param);
 					$cache->{$code} = 1;
             	}
@@ -62,14 +66,27 @@ sub create_handle {
 
 $cv->recv;
 
+sub _filter {
+	my ($param) = @_;
+
+	$param->{$_} = decode('utf8', $param->{$_}) for keys %{ $param };
+	$param->{features} =~ s/"/'/g;
+	$param->{notes} =~ s/"/'/g;
+    $param->{notes} =~ s/<br\s?\/?>/\n/g;
+	$param->{notes} =~ s/<\/?[a-zA-Z]*\s?[a-zA-Z]*=[^>]*?\s*\/?>//g;
+	$param;
+}
+
 sub __run_apple_script {
 	my ($param) = @_;
 
 	my $script = <<SCRIPT;
 tell first document of application "Delicious Library 2"
-set selected media to make new book with properties {name:"$param->{book_name}", creators:"$param->{authors}", genres:{"$param->{genres}"}, cover URL:"$param->{image}", isbn:"$param->{isbn}"}
+set selected media to make new book with properties {name:"$param->{book_name}", creators:"$param->{authors}", publisher:"$param->{publisher}", genres:"$param->{genres}", cover URL:"$param->{image}", isbn:"$param->{isbn}", price:"$param->{price}", features:"$param->{features}", notes:"$param->{notes}"}
 end tell
 SCRIPT
 
-	return RunAppleScript($script);
+    warn Dumper $param;
+	RunAppleScript($script);
+    warn $@ if $@;
 }
