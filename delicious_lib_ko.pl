@@ -52,7 +52,7 @@ sub create_handle {
 						features  => $result->{description},
 						notes     => $result->{content},
 					};
-					$param->{$_} = decode('utf8', $param->{$_}) for keys %{ $param };
+					$param->{$_} = decode('utf8', $param->{$_}) for keys %{ $param };  # WebService::Aladdin::Item is fucked
 					__run_apple_script($param);
 					$cache->{$code} = 1;
             	}
