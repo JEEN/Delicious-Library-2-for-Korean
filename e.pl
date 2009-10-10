@@ -9,6 +9,8 @@ use Term::ReadLine;
 
 my $file = $ENV{HOME} . "/Library/Application Support/Delicious Library 2/Scanned UPCs Log.txt";
 
+die "can't find Delicious Library 2" unless -f $file;
+
 my $term = Term::ReadLine->new();
 my $aladdin = WebService::Aladdin->new;
 
