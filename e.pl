@@ -16,7 +16,7 @@ while(defined(my $code = $term->readline("isbn> "))) {
 	my $res = $aladdin->search($code, { Cover => "Big" });
 	my $result = $res->{items}->[0];
 	unless ($result) {
-		warn "can't find a products : $code";
+		warn "can't find a product : $code";
 		next;
 	}
 	process_res($result);
