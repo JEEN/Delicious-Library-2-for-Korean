@@ -1,0 +1,52 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>aaaa</title>
+<style type="text/css">
+#bodyTag{margin:0;padding:54px 0 0 0;overflow:hidden}
+#bar{position:absolute;top:0;width:100%;height:54px;overflow:hidden;z-index:999;}
+#Iframe{ width:100%; height:100%;}
+
+</style>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script>
+
+function dodrop(event)
+{
+  var dt = event.dataTransfer;
+  var types = dt.types;
+  var data = dt.getData("text/html");
+  if (!data) {
+	alert('can not find ISBN');
+    return false;
+  }
+  item = data.match(/ISBN=([^"]+)"/);                                                                                            
+  var isbn = RegExp.$1;
+  if (!isbn) {
+	alert('can not find ISBN');
+    return false;
+  } 
+ document.getElementById('list').innerHTML += data + "&nbsp;&nbsp;";                                                                                      
+
+ $.getJSON('/input', { isbn: isbn }, function(json) {        
+      // TODO : jGrowl	                                                                                                                    
+  });                                                                                                                                     
+}                                                                                                                                         
+</script>
+</head>
+<body id="bodyTag" >
+
+<div id="bar">
+   <div id="output" style="min-height: 100px; background:#cccccc; white-space: pre; border: 1px solid black;" 						          
+     ondragenter="document.getElementById('output').textContent = ''; event.stopPropagation(); event.preventDefault();" 																			       
+     ondragover="event.stopPropagation(); event.preventDefault();"												     
+     ondrop="event.stopPropagation(); event.preventDefault(); dodrop(event);">     									
+   </div>                                            
+</div>
+<br/>                                                                        									
+<hr>
+<div id="list"></div>   
+<iframe id="Iframe" src="http://www.aladdin.co.kr" frameborder="0"></iframe>
+
+</body>
+</html>
