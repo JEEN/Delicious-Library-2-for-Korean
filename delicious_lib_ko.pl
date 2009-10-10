@@ -39,7 +39,7 @@ sub create_handle {
 	    		my ($handle, $code) = @_;
   	    		if ($flag && !$cache->{$code}) {
 					my $aladdin = WebService::Aladdin->new;
-					my $res = $aladdin->search($code);
+					my $res = $aladdin->search($code, { Cover => 'Big' });
 					my $result = $res->{items}->[0];
 					return undef unless $result;
 					my $param = {
