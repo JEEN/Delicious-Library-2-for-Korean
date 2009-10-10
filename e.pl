@@ -1,39 +1,53 @@
 #!/usr/bin/env perl
+# isbn input shell
 use strict;
 use warnings;
 use WebService::Aladdin;
 use Encode qw/decode/;
 use Mac::AppleScript qw(RunAppleScript);
+use Term::ReadLine;
 
 my $file = $ENV{HOME} . "/Library/Application Support/Delicious Library 2/Scanned UPCs Log.txt";
 
-my $code = shift or die $!;
-
+my $term = Term::ReadLine->new();
 my $aladdin = WebService::Aladdin->new;
-my $res = $aladdin->search($code, { Cover => "Big" });
+
+while(defined(my $code = $term->readline("isbn> "))) {
+	my $res = $aladdin->search($code, { Cover => "Big" });
+	my $result = $res->{items}->[0];
+	unless ($result) {
+		warn "can't find a products : $code";
+		next;
+	}
+	process_res($result);
+}
+
+sub process_res {
+	my ($result) = @_;
+
+	my $param = {
+		book_name => $result->{title},
+		authors   => $result->{author},
+		genres    => $result->{categoryName},
+		image     => $result->{cover},
+		publisher => $result->{publisher},
+		isbn      => $result->{isbn},
+		features  => $result->{description},
+		notes     => $result->{content},
+		url       => $result->{link},
+		pages     => $result->{itemPage},
+		price     => $result->{priceStandard},
+	};
 	
-my $result = $res->{items}->[0];
-die "can not find goods" unless $result;
+	$param = _filter($param);
+	__run_apple_script($param);
+	if ($@) {
+		warn "something's wrong : $@";
+		next;
+	} 
+	print $result->{title}."\n";
+}
 
-my $param = {
-	book_name => $result->{title},
-	authors   => $result->{author},
-	genres    => $result->{categoryName},
-	image     => $result->{cover},
-	publisher => $result->{publisher},
-	isbn      => $result->{isbn},
-	features  => $result->{description},
-	notes     => $result->{content},
-	url       => $result->{link},
-	pages     => $result->{itemPage},
-	price     => $result->{priceStandard},
-};
-
-$param = _filter($param);
-__run_apple_script($param);
-die $@ if $@;
-
-print $code."\t".$result->{title}."\n";
 
 sub _filter {
 	my ($param) = @_;
