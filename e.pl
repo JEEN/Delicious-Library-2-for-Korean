@@ -11,7 +11,7 @@ my $file = $ENV{HOME} . "/Library/Application Support/Delicious Library 2/Scanne
 
 die "can't find Delicious Library 2" unless -f $file;
 
-my $term = Term::ReadLine->new();
+my $term = Term::ReadLine->new("Delicious Library 2 Shell");
 my $aladdin = WebService::Aladdin->new;
 
 while(defined(my $code = $term->readline("isbn> "))) {
