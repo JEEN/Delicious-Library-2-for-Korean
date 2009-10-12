@@ -58,11 +58,11 @@ sub handler {
 }
 
 sub secret_key {
-    return '';
+    return 'Ph2xMo/2Kmk3CVA5b8pTro2BKJ5nSOtY7am3jw5u';
 }
 
 sub token {
-    return '';
+    return '19E64160MR69H1K90QG2';
 }
 
 sub aladdin_proxy {
@@ -122,7 +122,7 @@ sub _filter {
 sub _url_encode {
     my ($url) = @_;
 
-    my ($host,$query) = $url =~ m{^(http://.*/)(.*)$}i;
+    my ($host,$query) = $url =~ m{(http://.*/)([^ ]+)$}i;
     return $host . uri_escape($query,"^A-Za-z0-9\-_.~");
 }
 

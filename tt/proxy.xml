@@ -54,63 +54,23 @@
       <ItemLinks>
         <ItemLink>
           <Description>Technical Details</Description>
-          <URL>
-          [% url %]</URL>
+          <URL>[% url %]</URL>
         </ItemLink>
       </ItemLinks>
-      <SmallImage>
-        <URL>
-        [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-      </SmallImage>
-      <MediumImage>
-        <URL>
-        [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-      </MediumImage>
-      <LargeImage>
-        <URL>
-        [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-      </LargeImage>
       <ImageSets>
         <ImageSet Category="primary">
-          <SwatchImage>
-            <URL>
-            [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-          </SwatchImage>
           <SmallImage>
-            <URL>
-            [% image %]</URL>
+            <URL>[% image %]</URL>
         <Height Units="pixels">150</Height>
         <Width Units="pixels">109</Width>
           </SmallImage>
-          <ThumbnailImage>
-            <URL>
-            [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-          </ThumbnailImage>
-          <TinyImage>
-            <URL>
-            [% image %]</URL>
-        <Height Units="pixels">150</Height>
-        <Width Units="pixels">109</Width>
-          </TinyImage>
           <MediumImage>
-            <URL>
-            [% image %]</URL>
+            <URL>[% image %]</URL>
         <Height Units="pixels">150</Height>
         <Width Units="pixels">109</Width>
           </MediumImage>
           <LargeImage>
-            <URL>
-            [% image %]</URL>
+            <URL>[% image %]</URL>
         <Height Units="pixels">150</Height>
         <Width Units="pixels">109</Width>
           </LargeImage>
