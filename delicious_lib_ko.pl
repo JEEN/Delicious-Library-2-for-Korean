@@ -41,7 +41,10 @@ sub create_handle {
 					my $aladdin = WebService::Aladdin->new;
 					my $res = $aladdin->search($code, { Cover => 'Big' });
 					my $result = $res->{items}->[0];
-					return undef unless $result;
+					unless ($result) {
+						warn "cannot find a product : $code";
+						return;
+					}
 					my $param = {
 						book_name => $result->{title},
 						authors   => $result->{author},
