@@ -1,54 +1,27 @@
+#!/usr/bin/env perl
+# isbn input shell
 use strict;
 use warnings;
-use HTTP::Engine;
-use HTTP::Engine::Middleware;
-use File::Spec;
-use FindBin;
-use Template;
 use WebService::Aladdin;
-use Encode qw/encode decode/;
+use Encode qw/decode/;
 use Mac::AppleScript qw(RunAppleScript);
+use Term::ReadLine;
 
-my $mw = HTTP::Engine::Middleware->new;
-$mw->install('HTTP::Engine::Middleware::Static' => {
-    regexp => qr/^.*(\.txt|\.html|\.js|\.css|\.png)$/,
-    docroot => File::Spec->catdir($FindBin::Bin, qw(public_html)),
-});
+my $file = $ENV{HOME} . "/Library/Application Support/Delicious Library 2/Scanned UPCs Log.txt";
 
-HTTP::Engine->new(
-    interface => {
-      module => 'ServerSimple',
-      args => {
-        host => 'localhost',
-        port => '8080',
-      },
-      request_handler => $mw->handler(\&handler),
-    },
-)->run;
+die "can't find Delicious Library 2" unless -f $file;
 
-sub handler {
-  my $req = shift;
-  my $path = $req->uri->path;
- 
-  my $vars = {
-	req => $req,
-  };
+my $term = Term::ReadLine->new("Delicious Library 2 Shell");
+my $aladdin = WebService::Aladdin->new;
 
-  if ($path =~ /input/) {
-	warn $req->param('isbn');
-	my $aladdin = WebService::Aladdin->new;
-	my $res = $aladdin->search($req->param('isbn'), { Cover => "Big" });
+while(defined(my $code = $term->readline("isbn> "))) {
+	my $res = $aladdin->search($code, { Cover => "Big" });
 	my $result = $res->{items}->[0];
-	return _error() unless $result;
+	unless ($result) {
+		warn "can't find a product : $code";
+		next;
+	}
 	process_res($result);
-	return _error() if $@;
-	return _res('{ is_ok: 1 }');
-  } else {
-  	my $t = Template->new();
-  	my $file = "tt/default.html";
-  	my $body; $t->process($file, $vars, \$body);
-  	return HTTP::Engine::Response->new( body => $body );
-  }
 }
 
 sub process_res {
@@ -69,8 +42,14 @@ sub process_res {
 	};
 	
 	$param = _filter($param);
-	return __run_apple_script($param);
+	__run_apple_script($param);
+	if ($@) {
+		warn "something's wrong : $@";
+		next;
+	} 
+	print $result->{title}."\n";
 }
+
 
 sub _filter {
 	my ($param) = @_;
@@ -92,13 +71,5 @@ set selected media to make new book with properties {name:"$param->{book_name}",
 end tell
 SCRIPT
 
-	return RunAppleScript($script);
-}
-
-sub _res {
-	return HTTP::Engine::Response->new( body => shift );
-}
-
-sub _error {
-	return HTTP::Engine::Response->new( status => 404, body => "Not Found" );
+	RunAppleScript($script);
 }

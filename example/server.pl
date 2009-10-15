@@ -12,7 +12,7 @@ use Mac::AppleScript qw(RunAppleScript);
 my $mw = HTTP::Engine::Middleware->new;
 $mw->install('HTTP::Engine::Middleware::Static' => {
     regexp => qr/^.*(\.txt|\.html|\.js|\.css|\.png)$/,
-    docroot => File::Spec->catdir($FindBin::Bin, qw(public_html)),
+    docroot => File::Spec->catdir("$FindBin::Bin/../", qw(public_html)),
 });
 
 HTTP::Engine->new(
@@ -45,7 +45,7 @@ sub handler {
 	return _res('{ is_ok: 1 }');
   } else {
   	my $t = Template->new();
-  	my $file = "tt/default.html";
+  	my $file = "../tt/default.html";
   	my $body; $t->process($file, $vars, \$body);
   	return HTTP::Engine::Response->new( body => $body );
   }
