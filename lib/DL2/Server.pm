@@ -3,16 +3,12 @@ use Any::Moose;
 use HTTP::Engine;
 use Path::Class;
 
-use AnyEvent;
-use Coro;
-use Coro::AnyEvent;
 use DL2::Log;
 
 has 'conf' => ( is => 'rw');
 
 __PACKAGE__->meta->make_immutable;
 
-my $coro_debug;
 no Any::Moose;
 
 sub bootstrap {
@@ -50,77 +46,24 @@ sub BUILD {
     return $self;
 }
 
-sub make_request_handler {
-	my $self = shift;
-	
-	my $check_leak = $ENV{DL2_DEBUG} && eval { require Devel::LeakGuard::Object; 1};
-	
-	my $callback = $check_leak ?
-		unblock_sub {
-			my ($req, $cb) = @_;
-			Devel::LeakGuard::Object::leakguard(sub {
-				my $res = $self->handle_request($req);
-				$cb->($res);
-			});
-		} :
-		unblock_sub {
-			my ($req, $cb) = @_;
-			my $res = $self->handle_request($req);
-			$cb->($req);
-		};
-	return $callback;
-}
-
 sub run {
 	my $self = shift;
 	
 	DL2::Log->log( debug => "Initializing with HTTP::Engine version $HTTP::Engine::VERSION" );
 	my $engine = HTTP::Engine->new(
 		interface => {
-			module => 'AnyEvent',
-			args => $self->conf,
-			request_handler => $self->make_request_handler,
+			module => 'ServerSimple',
+			args => {
+				host => 'localhost',
+				port => '8080',
+			},
+			request_handler => sub { $self->handle_request(@_) },
 		},
 	);
 
 	my $owner_name = $self->owner_name;
 	
-	for my $proto (qw( http dl2 )) {
-		my $w; $w = AnyEvent->timer(
-			after => 0, cb => sub {
-				undef $w;
-				my $publiser = Net::Rendezvous::Publish->new or return;
-				my $service = $publiser->publish(
-					name => sprintf("%s's DL2 Server", $owner_name),
-					type => "_$proto._tcp",
-					port => $self->conf->{port},
-					domain => 'local',
-				);
-			},
-		);
-	}
-	
 	$engine->run;
-	DL2::Updater->start_workers(32);
-	DL2::Updater->start->periodic_updater($self->conf);
-	
-	if ($ENV{DL2_DEBUG}) {
-		require Coro::Debug;
-		$coro_debug = new_tcp_server Coro::Debug 10011;
-	}
-	
-	{
-		my $t; $t = AnyEvent->timer(
-			after => 0,
-			interval => 1,
-			cb => sub {
-				scalar $t;
-				schedule;
-			},
-		);
-	}
-	
-	AnyEvent->condvar->recv;
 }
 
 sub owner_name {
@@ -139,30 +82,11 @@ sub handle_request {
 	
 	my $path = $req->path;
 	
-	my $res = HTTP::Response->new;
+	my $res = HTTP::Engine::Response->new;
 	$path = $self->default_root($req) if $path eq '/';
 
-	eval {
-		if ($path =~ s!^/rpc/!!) {
-			$self->dispatch_rpc($path, $req, $res);
-		} elsif ($path =~ s!^/static/!!) {
-			$self->server_static_file($path, $req, $res);
-		} else {
-			die "Not found";
-		}
-	};
-	
-    if ($@ && $@ =~ /Not found/) {
-        $res->status(404);
-        $res->body("404 Not Found");
-    } elsif ($@ && $@ =~ /Forbidden/) {
-        $res->status(403);
-        $res->body("403 Forbidden");
-    } elsif ($@) {
-        $res->status(500);
-        $res->body("Internal Server Error: $@");
-        Remedie::Log->log(error => $@);
-    }
+	$res->status('200');
+	$res->body('WTF?');
     DL2::Log->log_request($req, $res);
 
     return $res;
