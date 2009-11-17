@@ -1,27 +1,23 @@
-This is Perl module DL2.
+Author : JEEN < jeen@perl.kr >
+Title : Delicious Library 2 for Aladdin / Korean
 
-INSTALLATION
+* ATTENTION
+ you must install these modules.
+  - Mac::AppleScript
+  - WebService::Aladdin
+  - AnyEvent (for iSight Capture)
 
-DL2 installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+* scripts
+- bin/term.pl
+ 1. Run Delicious Library 2
+ 2. run 'perl bin/term.pl' in Terminal
+ 3. Input your Item's Code (ISBN)
 
-    % cpan DL2
+- bin/isight.pl
+ 1. Run Delicious Library 2
+ 2. run 'perl bin/isight.pl' in Terminal
+ 3. Capture a barcode by Mac's iSight
 
-Download it, unpack it, then build it as per the usual:
+- bin/server.pl
+ -- not yet
 
-    % perl Makefile.PL
-    % make && make test
-
-Then install it:
-
-    % make install
-
-DOCUMENTATION
-
-DL2 documentation is available as in POD. So you can do:
-
-    % perldoc DL2
-
-to read the documentation online with your favorite pager.
-
-JEEN
