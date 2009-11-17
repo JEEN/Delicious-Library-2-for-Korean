@@ -1,9 +1,0 @@
-* 책 정보 항목 추가(발매일 등등등)
-* 모듈화
-* Aladdin / Daum / Naver 등의 책 정보 API를 선택가능 - (WebService::Aladdin / WebService::DaumBook / WebService::NaverBook 등의 모듈제작 필요?)
-* 디버그 정보 출력
-* Delicious Library 2 Scanner => Bookpedia 등의 외부 어플리케이션으로 전달
-* Aladdin 이 싫으면 YES24 / 교보문고 등의 Shop Link 를 선택가능
-* Review 정보를 긁어모으기
-* 백만커미터 양병설
-
