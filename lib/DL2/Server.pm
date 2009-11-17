@@ -62,7 +62,7 @@ sub response {
     my $title = $item->{title};
     my $html = <<HTML;
 <html><body>
-<script>alert("Added a Item into Delicious Library 2---\\nISBN: $isbn \\n"+ "Title: $title \\n"+ "Author: $author \\n"+ "---");</script>
+<script>alert("Added a Item into Delicious Library 2\\n---\\nISBN: $isbn \\n"+ "Title: $title \\n"+ "Author: $author \\n"+ "---");</script>
 </body></html>
 HTML
     return HTTP::Engine::Response->new(
