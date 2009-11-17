@@ -6,6 +6,7 @@ Title : Delicious Library 2 for Aladdin / Korean
   - Mac::AppleScript
   - WebService::Aladdin
   - AnyEvent (for iSight Capture)
+  - HTTP::Engine (for Bookmarklet)
 
 * scripts
 - bin/term.pl
@@ -19,5 +20,8 @@ Title : Delicious Library 2 for Aladdin / Korean
  3. Capture a barcode by Mac's iSight
 
 - bin/server.pl
- -- not yet
-
+ 1. Run Delicious Library 2
+ 2. run 'perl bin/server-starter.pl' in Terminal
+ 3. Install a Bookmarklet for DL2 
+ 4. open http://www.aladdin.co.kr/shop/wproduct.aspx?ISBN=.*
+ 5. click the Bookmarklet Button

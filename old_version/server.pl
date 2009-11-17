@@ -34,15 +34,15 @@ sub handler {
 	req => $req,
   };
 
-  if ($path =~ /input/) {
-	warn $req->param('isbn');
+  if ($path =~ /bookmarklet\/add/) {
+	warn $req->param('id');
 	my $aladdin = WebService::Aladdin->new;
-	my $res = $aladdin->search($req->param('isbn'), { Cover => "Big" });
+	my $res = $aladdin->search($req->param('id'), { Cover => "Big" });
 	my $result = $res->{items}->[0];
 	return _error() unless $result;
 	process_res($result);
 	return _error() if $@;
-	return _res('{ is_ok: 1 }');
+	return _res('<script>alert("Added");</script>');
   } else {
   	my $t = Template->new();
   	my $file = "tt/default.html";
