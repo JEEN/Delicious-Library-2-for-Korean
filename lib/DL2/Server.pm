@@ -15,9 +15,7 @@ sub bootstrap {
 	my ($class, $conf) = @_;
 	
 	my $self = $class->new(conf => $conf );
-	
-	$self->load_rpc_class([ $_ ]) for qw();
-	
+		
 	my $exit = sub { CORE::die "caught signal" };
 	eval {
 		local $SIG{INT} = $exit if !$ENV{DL2_DEBUG};
@@ -85,57 +83,26 @@ sub handle_request {
 	my $res = HTTP::Engine::Response->new;
 	$path = $self->default_root($req) if $path eq '/';
 
-	$res->status('200');
-	$res->body('WTF?');
-    DL2::Log->log_request($req, $res);
-
-    return $res;
-}
-
-sub load_rpc_class {
-	my ($self, $class_r) = @_;
-	
-	my $rpc_class = join "::", "DL2::Server::RPC", map String::CamelCase::camelize($_), @$class_r;
-	eval "require $rpc_class; 1" or die $@;
-	
-	return $rpc_class;
-}
-
-sub dispatch_rpc {
-	my ($self, $path, $req, $res) = @_;
-	
-	my @class = split '/', $path;
-	my $method = pop @class;
-	
-	die "Access to non-public methods" if $method =~ /^_/;
-	
-	my $rpc_class = $self->load_rpc_class(\@class);
-	
-	my $rpc = $rpc_class->new( conf => $self->conf );
-	
-	my $result;
 	eval {
-		my $code = $rpc->can($method) or die "Not Found";
-		my @attr = attributes::get($code);
-		if ( grep $_ eq 'POST', @attr) {
-			die "Request should be POST and X-DL2-Client header"
-				unless $req->method eq 'POST' && $req->header('X-DL2-Client');
-		}
-		$result = $rpc->$method($req, $res);
+	  if ($path =~ s!^/static/!!) {
+		$self->serve_static_file($path, $req, $res);
+	  }
 	};
 	
-	if ($@) {
-		$result->{error} = $@;
-	} elsif (ref $result eq 'HASH') {
-		$result->{success} = 1 unless defined $result->{success};
-	}
+	$res->status('200');
+	$res->body('WTF?');
 	
-	unless ($res->body) {
-		$res->status(200);
-		$res->content_type('application/json; charset=utf-8');
-		$res->body( my $json = DL2::JSON->encode($result) );
-		DL2::Log->log( debug => $res->body );
-	}
+        DL2::Log->log_request($req, $res);
+
+    	return $res;
+}
+
+sub dispatch {
+	my ($self, $path, $req, $res) = @_;
+	
+	my @classes = split '/', $path;
+
+        my $class = pop @classes;
 }
 
 sub serve_static_file {
