@@ -19,6 +19,6 @@ while(defined(my $code = $term->readline("isbn> "))) {
       	DL2::Updater->update($res->item);	
       };
       warn $@ if $@;
-      print sprintf("%s => %s\n", $code, $res->item->{title});
+      printf("%s => %s\n", $code, $res->item->{title});r
    }
 }

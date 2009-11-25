@@ -1,0 +1,5 @@
+#!/bin/sh
+
+PERL=/usr/bin/perl
+APP_PATH=`dirname "$0"`
+exec $PERL "$APP_PATH/bin/server-starter.pl"
