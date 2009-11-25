@@ -5,6 +5,11 @@ use HTTP::Engine;
 use DL2::Request;
 use DL2::Response;
 use DL2::Updater;
+use DL2::ISight::Handler;
+use AnyEvent;
+use Coro;
+use Coro::AnyEvent;
+use utf8;
 
 sub bootstrap {
    my ($class) = @_;
@@ -20,28 +25,56 @@ sub bootstrap {
 
 sub run {
    my ($class) = @_;
-
+ 
    my $engine = HTTP::Engine->new(
 	interface => {
-		module => 'ServerSimple',
+		module => 'AnyEvent',
 		args => {
-		   host => 'localhost',
+		   host => '127.0.0.1',
 		   port => '8080',
 		},
-		request_handler => sub { my $req = shift; $class->handler($req); },
-	});
+		request_handler => $class->make_request_handler,
+	},
+   );
 	
-  $engine->run;
+   $engine->run;
+   {
+       my $t; $t = AnyEvent->timer(
+           after => 0,
+           interval => 1,
+           cb => sub {
+               scalar $t;
+               schedule;
+           },
+       );
+   }
+  {
+     my $isight = DL2::ISight::Handler->new;
+     $isight->run;
+   }
+
+   AnyEvent->condvar->recv;
 }
 
-sub handler {
+sub make_request_handler {
+   my ($class) = @_;
+ 
+   my $callback = unblock_sub {
+	my ($req, $cb) = @_;
+	my $res = $class->handle_request($req);
+	$cb->($res);
+   };
+
+   return $callback;
+}
+
+sub handle_request {
    my ($class, $req) = @_;
 
    my $path = $req->uri->path;
 
    if ($path =~ /bookmarklet\/add/) {
 	my $isbn = $req->param('id');
-	warn $isbn;
 	my $request = DL2::Request->new({ keyword => $isbn });
 	my $res = DL2::Response->new( $request->get_item );
 	if ($res->has_item) {
@@ -62,7 +95,7 @@ sub response {
     my $title = $item->{title};
     my $html = <<HTML;
 <html><body>
-<script>alert("Added a Item into Delicious Library 2\\n---\\nISBN: $isbn \\n"+ "Title: $title \\n"+ "Author: $author \\n"+ "---");</script>
+<script>alert("Added a Item into Delicious Library 2\\n---\\nISBN: $isbn");</script>
 </body></html>
 HTML
     return HTTP::Engine::Response->new(
