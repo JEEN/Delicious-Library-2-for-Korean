@@ -84,7 +84,21 @@ sub handle_request {
 	    return $class->res_error($isbn) if $@;
 	    return $class->response($res->item);
 	}
-    }
+   } elsif ($path =~ /is_alive/) {
+       return $class->response_alive();
+   }
+}
+
+sub response_alive {
+    my ($class) = @_;
+
+    return HTTP::Engine::Response->new(
+	headers => {
+		'Content-Type' => qq{text/javascript; charset=utf-8},	
+	},
+	body => 'is_server_on=1;',
+	status => 200,
+    );
 }
 
 sub response {
