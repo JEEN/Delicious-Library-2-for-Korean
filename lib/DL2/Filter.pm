@@ -6,7 +6,7 @@ use Encode;
 sub process {
    my ($class, $result) = @_;
    
-   return {} unless $result;
+   return unless $result;
 
    my $param = {
 	title => $result->{title},

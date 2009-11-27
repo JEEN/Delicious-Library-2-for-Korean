@@ -9,7 +9,6 @@ use DL2::ISight::Handler;
 use AnyEvent;
 use Coro;
 use Coro::AnyEvent;
-use utf8;
 
 sub bootstrap {
    my ($class) = @_;
@@ -77,16 +76,23 @@ sub handle_request {
 	my $isbn = $req->param('id');
 	my $request = DL2::Request->new({ keyword => $isbn });
 	my $res = DL2::Response->new( $request->get_item );
-	if ($res->has_item) {
-	    eval {
-		DL2::Updater->update($res->item);
-	    };
-	    return $class->res_error($isbn) if $@;
-	    return $class->response($res->item);
+
+	unless ($res->has_item) {
+	   return $class->res_error($isbn);
 	}
+	    
+	eval {
+	   DL2::Updater->update($res->item);
+	};
+	return $class->res_error($isbn) if $@;
+	return $class->response($res->item);
+	
    } elsif ($path =~ /is_alive/) {
+
        return $class->response_alive();
+
    }
+   return HTTP::Engine::Response->new( status => 200, body => 'Hello, DL2 Server!!' );
 }
 
 sub response_alive {
