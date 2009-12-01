@@ -4,21 +4,14 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Term::ReadLine;
-use DL2;
-use DL2::Request;
-use DL2::Response;
-use DL2::Updater;
+use DL2::Controller;
 
 my $term = Term::ReadLine->new("Delicious Library 2 Shell");
 
 while(defined(my $code = $term->readline("isbn> "))) {
-   my $request = DL2::Request->new({ keyword => $code });
-   my $res = DL2::Response->new( $request->get_item() );
-   if ($res->has_item) {
-      eval {
-      	DL2::Updater->update($res->item);	
-      };
-      warn $@ if $@;
-      printf("%s => %s\n", $code, $res->item->{title});r
+   my $res = DL2::Controller->new({ keyword => $code });
+   $res->update;
+   if (!$res->is_error) { 
+     printf("%s => %s\n", $code, $res->get_item->{title});
    }
 }

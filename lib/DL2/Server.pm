@@ -2,9 +2,7 @@ package DL2::Server;
 use strict;
 use warnings;
 use HTTP::Engine;
-use DL2::Request;
-use DL2::Response;
-use DL2::Updater;
+use DL2::Controller;
 use DL2::ISight::Handler;
 use AnyEvent;
 use Coro;
@@ -74,18 +72,13 @@ sub handle_request {
 
    if ($path =~ /bookmarklet\/add/) {
 	my $isbn = $req->param('id');
-	my $request = DL2::Request->new({ keyword => $isbn });
-	my $res = DL2::Response->new( $request->get_item );
-
+	my $res = DL2::Controller->new({ keyword => $isbn });
 	unless ($res->has_item) {
 	   return $class->res_error($isbn);
 	}
-	    
-	eval {
-	   DL2::Updater->update($res->item);
-	};
-	return $class->res_error($isbn) if $@;
-	return $class->response($res->item);
+        $res->update;
+	return $class->res_error($isbn) if res->is_error;
+	return $class->response($res->get_item);
 	
    } elsif ($path =~ /is_alive/) {
 

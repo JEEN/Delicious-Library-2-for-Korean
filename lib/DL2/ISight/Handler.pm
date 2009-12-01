@@ -4,9 +4,7 @@ use warnings;
 use AnyEvent;
 use AnyEvent::Handle;
 use Carp;
-use DL2::Request;
-use DL2::Response;
-use DL2::Updater;
+use DL2::Controller;
 
 sub new { 
   my ($class) = shift;
@@ -67,14 +65,9 @@ sub create_handle {
 	     my ($hdl, $code) = @_;
 	     return unless $class->{flag};
 
-	     my $request = DL2::Request->new({ keyword => $code });                                       
-	     my $res = DL2::Response->new( $request->get_item() );                                        
-	     if ($res->has_item) {                                                                        
-	       eval {                                                                                    
-	         DL2::Updater->update($res->item);                                                       
-	       };                                                                                        
-	       warn $@ if $@;                                                                            
-	     }
+	     my $res = DL2::Controller->new({ keyword => $code });                                       
+	     $res->update;
+	     warn "error on AppleScript" if $res->is_error;
 	   });
 	},
    );
