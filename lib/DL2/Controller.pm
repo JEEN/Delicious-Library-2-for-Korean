@@ -4,6 +4,7 @@ use warnings;
 use WebService::Aladdin;
 use DL2::Filter;
 use DL2::Updater;
+use DL2::Schema;
 use Carp;
 
 sub new { 
@@ -13,6 +14,21 @@ sub new {
    $self->init($param);
    $self;
 }
+
+sub schema {
+    my ($class, $rs) = @_;
+
+    my $schema = DL2::Schema->connect(sprintf 'dbi:SQLite:/Users/%s/Library/Application Support/Delicious Library 2/Delicious Library Items.deliciouslibrary2', $class->owner_name);
+
+    $schema->resultset($rs);
+}
+
+sub owner_name {
+    my $self = shift;
+    my $user = getlogin;
+    return $user;
+}
+
 
 sub init {
    my ($class, $param) = @_;

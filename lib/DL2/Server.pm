@@ -80,12 +80,33 @@ sub handle_request {
 	return $class->res_error($isbn) if res->is_error;
 	return $class->response($res->get_item);
 	
+   } elsif ($path =~ /export/) {
+        my $item = DL2::Controller->schema('Item');
+        my $rs = $item->search({ ztype => 'Book' });
+        my @isbn = map { $_->zisbn } $rs->all;    
+        return $class->response_export(\@isbn);
    } elsif ($path =~ /is_alive/) {
 
        return $class->response_alive();
 
    }
    return HTTP::Engine::Response->new( status => 200, body => 'Hello, DL2 Server!!' );
+}
+
+sub response_export { 
+    my ($class, $isbn) = @_;
+
+    my $html = "<html><head><title>ExportISBN</title></head><body>";
+
+    foreach my $val (@{ $isbn }) {
+	$html .= $val.'<br/>';
+    }
+    $html .= '</body></html>';
+
+    return HTTP::Engine::Response->new(
+	status => 200,
+	body => $html,
+    );
 }
 
 sub response_alive {
