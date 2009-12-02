@@ -3,8 +3,11 @@ Revision history for Perl extension DL2
 0.03    Wed Dec  2 19:00:00 2009
         - added exporting ISBN for UserStoryBook.net
         - added a part of Schemas Declious Library 2
+        - checked server alive
+
 0.02    Tue Nov 17 17:45:00 2009
         - added Server mode 
         - added bookmarklet
+
 0.01    Tue Nov 17 12:30:18 2009
         - original version
