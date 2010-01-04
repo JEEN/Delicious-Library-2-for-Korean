@@ -42,16 +42,34 @@ sub handler {
   };
 
   my $response;
+  my $amazon_look_up_pat1 = qr#http://www\.amazon\.[a-z.]+/exec/obidos/ASIN/(?<isbn>\d{10})/ref=nosim/deliciousmons-\d{2}#;
+  my $amazon_look_up_pat2 = qr#http://www.amazon.com/gp/reader/(?<isbn>\d{10})#;
+
   if ($path =~ m{^/onca/xml}) {
       ( my $isbn ) = $req->uri->query =~ m{.*ItemId=(\d+)};
 
-      if( $isbn =~ /^89\d+$/ ) {
+      if( $isbn =~ /^89\d{8}$/ ) {
           $response = aladdin_proxy($isbn);
       } else {
           $response = amazon_proxy($isbn);
       }
 
       return HTTP::Engine::Response->new( body => $response );
+  } elsif ($req->uri =~ $amazon_look_up_pat1 or $req->uri =~ $amazon_look_up_pat2)  {
+      my $isbn = $+{isbn};
+      if( $isbn =~ /^89\d{8}$/ ) {
+          my $ua = LWP::UserAgent->new;
+          $ua->agent("Library/2.2 CFNetwork/454.4 Darwin/10.0.0 (i386) (MacBook1%2C1)");
+
+          my $response = $ua->get('http://www.aladdin.co.kr/shop/wproduct.aspx?ISBN=' . $isbn);
+          return HTTP::Engine::Response->new( body => $response->content );
+      } else {
+          my $ua = LWP::UserAgent->new;
+          $ua->agent("Library/2.2 CFNetwork/454.4 Darwin/10.0.0 (i386) (MacBook1%2C1)");
+
+          my $response = $ua->get($req->uri);
+          return HTTP::Engine::Response->new( body => $response->content );
+      }
   } else {
       return HTTP::Engine::Response->new( body => $req->uri );
   }
