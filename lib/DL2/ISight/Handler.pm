@@ -33,7 +33,12 @@ sub get_fh {
   my ($class) = @_;
 
   my $file = $class->{file} || $ENV{HOME} . "/Library/Application Support/Delicious Library 2/Scanned UPCs Log.txt";
-  open my $fh, '<', $file or croak "Do you rellay have Delicious Library 2?";  
+
+  open my $fh, "<", $file or do {
+      open my $fh1, ">", $file; 
+      close $fh1;
+  };
+
   return $fh;
 }
 

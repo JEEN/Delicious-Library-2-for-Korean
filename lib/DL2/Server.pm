@@ -35,6 +35,7 @@ sub run {
    );
 	
    $engine->run;
+=for comment
    {
        my $t; $t = AnyEvent->timer(
            after => 0,
@@ -45,6 +46,7 @@ sub run {
            },
        );
    }
+=cut
   {
      my $isight = DL2::ISight::Handler->new;
      $isight->run;
