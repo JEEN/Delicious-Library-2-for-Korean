@@ -25,11 +25,15 @@ sub run {
  
    my $engine = HTTP::Engine->new(
 	interface => {
-		module => 'AnyEvent',
+		module => 'ReverseHTTP',
 		args => {
-		   host => '127.0.0.1',
-		   port => '8080',
-		},
+		    label => 'jeen',
+		    endpoint => 'http://www.reversehttp.net/reversehttp',
+                },
+#		args => {
+#		   host => '127.0.0.1',
+#		   port => '8080',
+#		},
 		request_handler => $class->make_request_handler,
 	},
    );
